@@ -1,0 +1,290 @@
+.game-lobby {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 24px;
+  color: #e0e0f0;
+}
+
+.game-lobby__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #1e1e2e;
+  border: 1px solid #3a3a5c;
+  border-radius: 10px 10px 0 0;
+  padding: 14px 20px;
+  border-bottom: none;
+}
+
+.game-lobby__room-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.game-lobby__room-label {
+  font-size: 12px;
+  color: #9090b0;
+}
+
+.game-lobby__room-id {
+  font-size: 16px;
+  font-weight: 600;
+  color: #a0a0ff;
+  letter-spacing: 0.05em;
+}
+
+.game-lobby__leave-btn {
+  background: transparent;
+  border: 1px solid #5a3a3a;
+  color: #f87171;
+  border-radius: 6px;
+  padding: 5px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.game-lobby__leave-btn:hover {
+  background: #3a1a1a;
+}
+
+.game-lobby__body {
+  background: #1e1e2e;
+  border: 1px solid #3a3a5c;
+  border-radius: 0 0 10px 10px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.game-lobby__section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.game-lobby__section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #9090b0;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.game-lobby__spectator-count {
+  font-weight: 400;
+  color: #6060a0;
+}
+
+.game-lobby__player-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.game-lobby__player-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #12121e;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.game-lobby__player-status {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.game-lobby__player-status--online {
+  background: #4ade80;
+}
+
+.game-lobby__player-status--offline {
+  background: #6b7280;
+}
+
+.game-lobby__player-name {
+  flex: 1;
+  color: #e0e0f0;
+}
+
+.game-lobby__player-you {
+  color: #9090b0;
+  font-size: 12px;
+}
+
+.game-lobby__player-reconnecting {
+  font-size: 11px;
+  color: #f59e0b;
+}
+
+.game-lobby__player-empty {
+  font-size: 13px;
+  color: #6060a0;
+  padding: 8px 12px;
+}
+
+.game-lobby__game-options {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.game-lobby__game-option {
+  padding: 8px 18px;
+  border-radius: 6px;
+  border: 1px solid #4a4a6a;
+  background: #12121e;
+  color: #c0c0e0;
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.game-lobby__game-option:hover:not(:disabled) {
+  border-color: #4f46e5;
+  color: #e0e0f0;
+}
+
+.game-lobby__game-option--selected {
+  border-color: #4f46e5;
+  background: #2a2a4e;
+  color: #a0a0ff;
+}
+
+.game-lobby__game-option:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.game-lobby__game-active {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #e0e0f0;
+}
+
+.game-lobby__game-status-badge {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: #2a4a2a;
+  color: #4ade80;
+  font-weight: 400;
+}
+
+.game-lobby__creator-hint {
+  margin: 0;
+  font-size: 12px;
+  color: #6060a0;
+}
+
+.game-lobby__start-btn {
+  align-self: flex-start;
+  padding: 10px 28px;
+  background: #4f46e5;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.game-lobby__start-btn:hover:not(:disabled) {
+  background: #4338ca;
+}
+
+.game-lobby__start-btn:disabled {
+  background: #3a3a5c;
+  cursor: not-allowed;
+}
+
+/* Leave confirmation dialog */
+.game-lobby__confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.game-lobby__confirm-box {
+  background: #1e1e2e;
+  border: 1px solid #3a3a5c;
+  border-radius: 12px;
+  padding: 28px 24px;
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  color: #e0e0f0;
+}
+
+.game-lobby__confirm-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.game-lobby__confirm-desc {
+  margin: 0;
+  font-size: 13px;
+  color: #9090b0;
+}
+
+.game-lobby__confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.game-lobby__confirm-btn {
+  padding: 7px 18px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+}
+
+.game-lobby__confirm-btn--cancel {
+  background: transparent;
+  border: 1px solid #4a4a6a;
+  color: #9090b0;
+}
+
+.game-lobby__confirm-btn--cancel:hover {
+  background: #ffffff10;
+}
+
+.game-lobby__confirm-btn--confirm {
+  background: #ef4444;
+  color: #fff;
+}
+
+.game-lobby__confirm-btn--confirm:hover {
+  background: #dc2626;
+}

@@ -1,0 +1,75 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 0 24px;
+  height: 52px;
+  background: #1a1a2e;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.navbar-brand {
+  font-size: 16px;
+  font-weight: 600;
+  margin-right: auto;
+}
+
+.navbar-links {
+  display: flex;
+  gap: 4px;
+}
+
+.navbar-link {
+  padding: 6px 16px;
+  border-radius: 6px;
+  color: #ffffffaa;
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.navbar-link:hover {
+  color: #fff;
+  background: #ffffff18;
+}
+
+.navbar-link--active {
+  color: #fff;
+  background: #4f46e5;
+}
+
+.navbar-settings-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid #3a3a5c;
+  border-radius: 6px;
+  color: #ffffffaa;
+  cursor: pointer;
+  padding: 4px 10px;
+  font-size: 13px;
+  margin-left: 8px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.navbar-settings-btn:hover {
+  background: #ffffff18;
+  color: #fff;
+}
+
+.navbar-nickname {
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.navbar-anon {
+  color: #9090b0;
+}
+
+.navbar-settings-icon {
+  font-size: 14px;
+}

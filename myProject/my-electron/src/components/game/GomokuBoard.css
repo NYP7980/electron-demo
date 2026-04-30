@@ -1,0 +1,85 @@
+.gomoku-board-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  user-select: none;
+}
+
+.gomoku-status {
+  font-size: 15px;
+  font-weight: 500;
+  color: #e0e0f0;
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+}
+
+.gomoku-status__turn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gomoku-status__dot {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.gomoku-status__dot--black {
+  background: #1a1a1a;
+  border: 1px solid #555;
+}
+
+.gomoku-status__dot--white {
+  background: #f5f5f5;
+  border: 1px solid #ccc;
+}
+
+.gomoku-status__winner {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fbbf24;
+  letter-spacing: 0.02em;
+}
+
+.gomoku-svg {
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  display: block;
+  max-width: 100%;
+}
+
+.gomoku-legend {
+  display: flex;
+  gap: 20px;
+  font-size: 13px;
+  color: #9090b0;
+}
+
+.gomoku-legend__item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.gomoku-legend__dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.gomoku-legend__dot--black {
+  background: #1a1a1a;
+  border: 1px solid #555;
+}
+
+.gomoku-legend__dot--white {
+  background: #f5f5f5;
+  border: 1px solid #ccc;
+}

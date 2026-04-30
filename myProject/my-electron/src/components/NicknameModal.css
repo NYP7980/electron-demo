@@ -1,0 +1,88 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-box {
+  background: #1e1e2e;
+  border: 1px solid #3a3a5c;
+  border-radius: 12px;
+  padding: 32px 28px 24px;
+  width: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  color: #e0e0f0;
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.modal-desc {
+  margin: 0;
+  font-size: 13px;
+  color: #9090b0;
+}
+
+.modal-input {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #4a4a6a;
+  background: #12121e;
+  color: #e0e0f0;
+  font-size: 14px;
+  outline: none;
+}
+
+.modal-input:focus {
+  border-color: #4f46e5;
+}
+
+.modal-error {
+  margin: 0;
+  font-size: 12px;
+  color: #f87171;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.modal-btn {
+  padding: 7px 18px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.modal-btn--skip {
+  background: transparent;
+  color: #9090b0;
+  border: 1px solid #4a4a6a;
+}
+
+.modal-btn--skip:hover {
+  background: #ffffff10;
+}
+
+.modal-btn--confirm {
+  background: #4f46e5;
+  color: #fff;
+}
+
+.modal-btn--confirm:hover {
+  background: #4338ca;
+}

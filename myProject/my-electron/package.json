@@ -2,6 +2,7 @@
   "name": "my-electron",
   "version": "0.1.0",
   "private": true,
+  "homepage": "./",
   "main": "electron-dist/main.js",
   "dependencies": {
     "@testing-library/dom": "^10.4.1",
@@ -12,8 +13,10 @@
     "@types/node": "^16.18.126",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "@types/react-router-dom": "^5.3.3",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
+    "react-router-dom": "^7.14.2",
     "react-scripts": "5.0.1",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
@@ -23,6 +26,7 @@
     "cross-env": "^7.0.3",
     "electron": "^33.4.11",
     "electron-builder": "^25.1.8",
+    "fast-check": "^4.7.0",
     "wait-on": "^8.0.5"
   },
   "scripts": {
@@ -35,6 +39,21 @@
     "electron:launch": "wait-on http://localhost:3000 && npm run electron:compile && electron .",
     "electron:build": "npm run build && npm run electron:compile && electron-builder",
     "electron:start": "npm run electron:compile && electron ."
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "^react-router-dom$": "<rootDir>/node_modules/react-router-dom/dist/index.js",
+      "^react-router$": "<rootDir>/node_modules/react-router/dist/development/index.js",
+      "^react-router/dom$": "<rootDir>/node_modules/react-router/dist/development/dom-export.js",
+      "^fast-check$": "<rootDir>/node_modules/fast-check/lib/cjs/fast-check.js",
+      "^pure-rand/generator/congruential32$": "<rootDir>/node_modules/pure-rand/lib/generator/congruential32.js",
+      "^pure-rand/generator/mersenne$": "<rootDir>/node_modules/pure-rand/lib/generator/mersenne.js",
+      "^pure-rand/generator/xorshift128plus$": "<rootDir>/node_modules/pure-rand/lib/generator/xorshift128plus.js",
+      "^pure-rand/generator/xoroshiro128plus$": "<rootDir>/node_modules/pure-rand/lib/generator/xoroshiro128plus.js",
+      "^pure-rand/utils/skipN$": "<rootDir>/node_modules/pure-rand/lib/utils/skipN.js",
+      "^pure-rand/distribution/uniformBigInt$": "<rootDir>/node_modules/pure-rand/lib/distribution/uniformBigInt.js",
+      "^pure-rand/distribution/uniformInt$": "<rootDir>/node_modules/pure-rand/lib/distribution/uniformInt.js"
+    }
   },
   "eslintConfig": {
     "extends": [
@@ -57,6 +76,10 @@
   "build": {
     "appId": "com.myapp.electron",
     "productName": "My Electron App",
+    "extends": null,
+    "extraMetadata": {
+      "main": "electron-dist/main.js"
+    },
     "directories": {
       "output": "dist"
     },

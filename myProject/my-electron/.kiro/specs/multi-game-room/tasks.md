@@ -1,0 +1,264 @@
+# Implementation Plan: Multi-Game Room Electron Application
+
+## Overview
+
+Incremental implementation starting from routing infrastructure, through game engines, to WebSocket integration. Each task builds on the previous. The server and client are developed in parallel tracks that converge at the WebSocket integration task.
+
+## Tasks
+
+- [x] 1. Install dependencies and set up project structure
+  - Install `react-router-dom`, `fast-check` (devDep)
+  - Create directory structure: `src/contexts/`, `src/hooks/`, `src/games/`, `src/pages/`, `src/components/game/`, `server/`
+  - Initialize `server/package.json` with `ws`, `uuid`, `typescript`
+  - _Requirements: 1.1, 14.1_
+
+- [x] 2. Implement routing and navigation shell
+  - [x] 2.1 Wrap `App.tsx` with `HashRouter` and define two routes: `/demo` and `/game`
+    - Move existing panels into `src/pages/FeatureDemoPage.tsx`
+    - Create stub `src/pages/GameRoomPage.tsx`
+    - _Requirements: 1.1, 1.2, 1.3_
+  - [x] 2.2 Build `NavBar` component with active route highlighting
+    - Persistent top bar with "功能演示" and "游戏棋牌室" links
+    - Visual active state via `NavLink`
+    - _Requirements: 1.5, 12.1_
+  - [x] 2.3 Write unit tests for routing
+    - Test NavBar renders both links, active class applied correctly
+    - Test route renders correct page component
+    - _Requirements: 1.2, 1.3_
+
+- [x] 3. Implement player identity system
+  - [x] 3.1 Create `PlayerContext` with `useReducer` for nickname state
+    - Actions: `SET_NICKNAME`, `CLEAR_NICKNAME`
+    - Persist nickname to `localStorage` on set
+    - _Requirements: 3.1, 3.2, 3.3_
+  - [x] 3.2 Build `NicknameModal` component
+    - Shows on first launch if no nickname in localStorage
+    - Input validation: 1–16 non-whitespace characters
+    - "跳过" button sets anonymous state
+    - Settings icon in NavBar to reopen modal outside active game
+    - _Requirements: 3.1, 3.2, 3.3, 3.7_
+  - [x] 3.3 Write property test for nickname validation
+    - **Property 1: Nickname validation is consistent**
+    - **Validates: Requirements 3.2**
+    - _Requirements: 3.2_
+  - [x] 3.4 Write unit tests for NicknameModal
+    - Test valid input registers player, skip sets anonymous, too-long input blocked
+    - _Requirements: 3.1, 3.2, 3.3_
+
+- [x] 4. Implement Gomoku game engine
+  - [x] 4.1 Create `src/games/gomoku.ts` with board state and move logic
+    - `createInitialState()` → 15×15 empty board
+    - `applyMove(state, move, side)` → new state or error
+    - `getValidMoves(state)` → all empty intersections for current turn
+    - _Requirements: 6.1, 6.2, 6.3, 6.6_
+  - [x] 4.2 Implement win detection in `gomoku.ts`
+    - `checkWinner(board)` → scan all rows, cols, diagonals for 5 in a row
+    - `checkDraw(board)` → board full with no winner
+    - _Requirements: 6.4, 6.5_
+  - [x] 4.3 Write property test for Gomoku win detection
+    - **Property 5: Gomoku win detection covers all directions**
+    - **Validates: Requirements 6.4**
+    - _Requirements: 6.4_
+  - [x] 4.4 Write property test for Gomoku move validation
+    - **Property 6: Gomoku move validation rejects illegal placements**
+    - **Validates: Requirements 6.6**
+    - _Requirements: 6.6_
+
+- [-] 5. Implement Army Chess game engine
+  - [x] 5.1 Create `src/games/armyChess.ts` — board layout and piece definitions
+    - Define all 12 piece types with rank values
+    - Define board terrain map (5×12 grid with road/railway/camp/hq/mountain)
+    - `createInitialPieces(side)` → 25 pieces for one side
+    - _Requirements: 7.1, 7.2, 7.3_
+  - [x] 5.2 Implement Army Chess movement rules
+    - `getValidMoves(state, pieceId)` → valid destination cells
+    - Road: 1 step along connected road cells
+    - Railway: Engineer continuous traversal, others 1 step, no jumping occupied
+    - Camp: pieces in camp are immune, cannot be targeted
+    - _Requirements: 7.5, 7.7, 7.10_
+  - [x] 5.3 Implement Army Chess combat resolution
+    - `resolveCombat(attacker, defender)` → 'attacker_wins' | 'defender_wins' | 'both_eliminated'
+    - Full rank hierarchy including Bomb, Landmine, Engineer special rules
+    - _Requirements: 7.6_
+  - [x] 5.4 Implement Army Chess win conditions
+    - `checkWinner(state)` → detect Flag captured or no movable pieces
+    - _Requirements: 7.8, 7.9_
+  - [x] 5.5 Write property test for Army Chess combat resolution
+    - **Property 7: Army Chess combat resolution follows rank hierarchy**
+    - **Validates: Requirements 7.6**
+    - _Requirements: 7.6_
+  - [x] 5.6 Write property test for Army Chess movement validation
+    - **Property 8: Army Chess movement only produces valid destinations**
+    - **Validates: Requirements 7.5**
+    - _Requirements: 7.5_
+  - [x] 5.7 Write property test for camp immunity
+    - **Property 9: Camp immunity holds for all pieces**
+    - **Validates: Requirements 7.7**
+    - _Requirements: 7.7_
+
+- [x] 6. Implement Jungle Chess game engine
+  - [x] 6.1 Create `src/games/jungleChess.ts` — board layout and piece definitions
+    - Define 8 animal types with strength values (Elephant=8 … Rat=1)
+    - Define 7×9 terrain map (land/river/trap/den)
+    - `createInitialState()` → standard starting positions
+    - _Requirements: 8.1, 8.2_
+  - [x] 6.2 Implement Jungle Chess movement rules
+    - `getValidMoves(state, pieceId)` → valid destinations
+    - Rat: can enter river; Lion/Tiger: jump over river if no Rat in river on that line
+    - No other piece enters river
+    - _Requirements: 8.3, 8.7_
+  - [x] 6.3 Implement Jungle Chess combat and terrain effects
+    - `resolveCombat(attacker, defender, defenderInTrap)` → outcome
+    - Trap: defender effective rank = 0
+    - Rat captures Elephant special rule
+    - Den entry win condition
+    - _Requirements: 8.4, 8.5, 8.6, 8.8_
+  - [x] 6.4 Write property test for Jungle Chess combat
+    - **Property 10: Jungle Chess combat follows animal hierarchy**
+    - **Validates: Requirements 8.4, 8.8**
+    - _Requirements: 8.4, 8.8_
+  - [x] 6.5 Write property test for Jungle Chess terrain movement
+    - **Property 11: Jungle Chess terrain movement rules are enforced**
+    - **Validates: Requirements 8.7**
+    - _Requirements: 8.7_
+  - [x] 6.6 Write property test for trap rank reduction
+    - **Property 12: Trap reduces effective rank to zero**
+    - **Validates: Requirements 8.6**
+    - _Requirements: 8.6_
+
+- [x] 7. Checkpoint — Ensure all game engine tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 8. Build WebSocket server
+  - [x] 8.1 Create `server/index.ts` — HTTP + WS server bootstrap
+    - `ws` WebSocket server on configurable port
+    - Heartbeat ping every 25s, terminate on 30s timeout
+    - _Requirements: 14.1, 14.5_
+  - [x] 8.2 Implement `server/SessionManager.ts`
+    - Assign UUID session ID on connect, send `session_init`
+    - Track `sessionId → WebSocket` mapping
+    - _Requirements: 14.2_
+  - [x] 8.3 Implement `server/MessageValidator.ts`
+    - Validate all incoming message shapes before processing
+    - Return typed error for malformed messages
+    - _Requirements: 14.3_
+  - [x] 8.4 Write property test for message validation
+    - **Property 14: Malformed messages are rejected by the server**
+    - **Validates: Requirements 14.3**
+    - _Requirements: 14.3_
+  - [x] 8.5 Implement `server/RoomManager.ts`
+    - `joinRoom(sessionId, roomId, nickname)` — create or join
+    - `leaveRoom(sessionId)` — remove player, notify room
+    - Room cleanup timer (5 min after all players leave)
+    - Spectator support for anonymous users and full rooms
+    - _Requirements: 4.4, 4.5, 10.1, 10.3, 10.4, 10.6_
+  - [x] 8.6 Write property test for room join behavior
+    - **Property 4: Room join is idempotent for existing rooms**
+    - **Validates: Requirements 4.4, 4.5**
+    - _Requirements: 4.4, 4.5_
+  - [x] 8.7 Implement move sequencing and rejection in `server/RoomManager.ts`
+    - Monotonic `seq` counter per room
+    - Reject moves with seq ≤ current room seq
+    - _Requirements: 9.6_
+  - [x] 8.8 Write property test for sequence number rejection
+    - **Property 13: Stale sequence numbers are rejected**
+    - **Validates: Requirements 9.6**
+    - _Requirements: 9.6_
+  - [x] 8.9 Implement `server/MessageHandler.ts`
+    - Route all client message types to correct handler
+    - Integrate game engines for move validation and state updates
+    - Broadcast `move_applied` or `move_rejected` to room
+    - _Requirements: 9.1, 9.2, 9.3, 15.2_
+  - [x] 8.10 Implement disconnect/reconnect handling
+    - On disconnect: hold seat 5 min, broadcast `player_disconnected`
+    - On reconnect within timeout: restore seat, send full game state
+    - On timeout expiry: remove player, broadcast update
+    - _Requirements: 9.4, 9.5, 11.1, 11.2, 11.3, 11.4_
+
+- [x] 9. Build game room UI
+  - [x] 9.1 Build `RoomEntry` component
+    - Room ID input with validation (non-empty)
+    - Connect button with loading state
+    - Error display for connection failures
+    - Anonymous user sees spectator-only notice
+    - _Requirements: 4.1, 4.2, 4.3, 3.4, 3.5_
+  - [x] 9.2 Write unit tests for RoomEntry
+    - Test empty ID blocked, loading state shown, error displayed
+    - _Requirements: 4.3, 13.5_
+  - [x] 9.3 Build `GameLobby` component
+    - Player list with nicknames and connection status
+    - Game type selector (creator only)
+    - Start game button (creator only, min players met)
+    - Spectator count display
+    - Leave Room button with confirmation dialog
+    - _Requirements: 5.1, 5.5, 10.1, 10.2, 10.5, 12.2, 12.3_
+  - [x] 9.4 Build `GomokuBoard` component
+    - 15×15 SVG or CSS grid with intersection click targets
+    - Render black/white pieces, highlight last move
+    - Turn indicator, winner overlay
+    - _Requirements: 6.1, 6.2, 6.3, 15.4, 15.5_
+  - [x] 9.5 Build `ArmyChessBoard` component
+    - Render 5×12 board with terrain visual distinctions
+    - Setup phase: drag-and-drop or click-to-place piece arrangement
+    - Playing phase: click piece → highlight valid moves → click destination
+    - Hide opponent piece labels (show back of piece)
+    - Reveal piece on combat
+    - _Requirements: 7.1, 7.2, 7.4, 7.10_
+  - [x] 9.6 Build `JungleChessBoard` component
+    - Render 7×9 board with river/trap/den visual distinctions
+    - Click piece → highlight valid moves → click destination
+    - _Requirements: 8.1, 8.2, 8.3_
+
+- [x] 10. Implement WebSocket client hook
+  - [x] 10.1 Create `src/hooks/useGameSocket.ts`
+    - Connect to server URL from env variable
+    - Auto-reconnect up to 3 times with 2s backoff
+    - Heartbeat ping every 25s
+    - Dispatch incoming messages to `RoomContext` reducer
+    - _Requirements: 13.2, 9.5_
+  - [x] 10.2 Create `RoomContext` with `useReducer`
+    - Handle all `ServerMessage` types as reducer actions
+    - Expose `sendMessage`, `roomState`, `connected`, `reconnecting`
+    - _Requirements: 9.3, 11.5_
+  - [x] 10.3 Write unit tests for useGameSocket
+    - Mock WebSocket, test reconnect fires 3 times then stops
+    - Test ping sent on interval
+    - _Requirements: 13.2_
+
+- [x] 11. Wire client to server — end-to-end integration
+  - [x] 11.1 Connect `RoomEntry` → `useGameSocket` → server join flow
+    - On submit: send `join_room`, handle `room_joined` / `error` responses
+    - Navigate to lobby on success
+    - _Requirements: 4.2, 4.4, 4.5, 4.6_
+  - [x] 11.2 Connect `GameLobby` → game type selection and start game flow
+    - Creator sends `select_game`, all clients receive `game_selected`
+    - Creator sends `start_game`, all clients receive `game_started` with initial state
+    - _Requirements: 5.2, 5.3, 10.2_
+  - [x] 11.3 Connect game boards → move flow
+    - On valid local move: send `make_move` with current seq+1
+    - On `move_applied`: update game state from server response
+    - On `move_rejected`: show reason, revert optimistic update
+    - On `game_ended`: show result overlay
+    - _Requirements: 9.1, 9.2, 9.3, 13.3, 13.4, 15.1_
+  - [x] 11.4 Connect Army Chess setup phase
+    - Send `confirm_setup` with piece arrangement
+    - Wait for both players to confirm before `game_started`
+    - _Requirements: 7.2, 7.4_
+  - [x] 11.5 Write property test for anonymous user role enforcement
+    - **Property 2: Anonymous users are always spectators**
+    - **Validates: Requirements 3.4**
+    - _Requirements: 3.4_
+  - [x] 11.6 Write property test for room ID validation
+    - **Property 3: Room ID validation rejects blank inputs**
+    - **Validates: Requirements 4.3**
+    - _Requirements: 4.3_
+
+- [x] 12. Final checkpoint — Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+## Notes
+
+- The server (`server/`) is a separate Node.js project; deploy independently to any cloud host supporting WebSocket (Railway, Render, Fly.io, etc.)
+- Server URL is configured via `REACT_APP_WS_URL` environment variable in the client
+- Army Chess board coordinates: row 0–11, col 0–4; player red occupies rows 6–11, blue rows 0–5
+- Jungle Chess board coordinates: row 0–8, col 0–6; player red occupies rows 6–8, blue rows 0–2
