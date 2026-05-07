@@ -6,13 +6,9 @@ import { MessageHandler } from './MessageHandler';
 import { validateMessage } from './MessageValidator';
 
 const PORT = parseInt(process.env.PORT ?? '4000', 10);
+const HOST = process.env.HOST ?? '0.0.0.0';
 
-const HEARTBEAT_INTERVAL_MS = 25_000;  // ping every 25s
-const HEARTBEAT_TIMEOUT_MS  = 30_000;  // terminate if no pong within 30s
-
-// ---------------------------------------------------------------------------
-// Bootstrap
-// ---------------------------------------------------------------------------
+const HEARTBEAT_INTERVAL_MS = 25_000;
 
 const server = http.createServer((_req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -22,12 +18,8 @@ const server = http.createServer((_req, res) => {
 const wss = new WebSocketServer({ server });
 
 const sessions = new SessionManager();
-const rooms    = new RoomManager(sessions);
-const handler  = new MessageHandler(sessions, rooms);
-
-// ---------------------------------------------------------------------------
-// Connection handling
-// ---------------------------------------------------------------------------
+const rooms = new RoomManager(sessions);
+const handler = new MessageHandler(sessions, rooms);
 
 wss.on('connection', (ws: WebSocket) => {
   const sessionId = sessions.createSession(ws);
@@ -51,9 +43,7 @@ wss.on('connection', (ws: WebSocket) => {
       return;
     }
 
-    // Reset heartbeat liveness on any message
     sessions.markAlive(sessionId);
-
     handler.handle(sessionId, result.message);
   });
 
@@ -71,14 +61,9 @@ wss.on('connection', (ws: WebSocket) => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// Heartbeat — ping every 25s, terminate if no response within 30s
-// ---------------------------------------------------------------------------
-
 const heartbeatInterval = setInterval(() => {
   sessions.forEachSession((session) => {
     if (!session.isAlive) {
-      // No pong received since last ping — terminate
       session.ws.terminate();
       return;
     }
@@ -87,15 +72,10 @@ const heartbeatInterval = setInterval(() => {
   });
 }, HEARTBEAT_INTERVAL_MS);
 
-// Ensure the interval doesn't keep the process alive
 heartbeatInterval.unref?.();
 
-// ---------------------------------------------------------------------------
-// Start
-// ---------------------------------------------------------------------------
-
-server.listen(PORT, () => {
-  console.log(`[server] WebSocket server listening on port ${PORT}`);
+server.listen(PORT, HOST, () => {
+  console.log(`[server] WebSocket server listening on ${HOST}:${PORT}`);
 });
 
 export { server, wss, sessions, rooms, handler };

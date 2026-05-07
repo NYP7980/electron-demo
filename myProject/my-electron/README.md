@@ -44,3 +44,31 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+## Game Room Cloud Server Config
+
+The game room client connects through [src/hooks/useGameSocket.ts](/D:/codeHub/myProject/my-electron/src/hooks/useGameSocket.ts), and the WebSocket server lives in [server/src/index.ts](/D:/codeHub/myProject/my-electron/server/src/index.ts).
+
+Use these config files when moving the game room to a cloud server:
+
+1. Local frontend config: copy [.env.development.example](/D:/codeHub/myProject/my-electron/.env.development.example) to `.env.development`
+2. Production frontend config: copy [.env.production.example](/D:/codeHub/myProject/my-electron/.env.production.example) to `.env.production`
+3. Server config: copy [server/.env.example](/D:/codeHub/myProject/my-electron/server/.env.example) to `server/.env`
+
+Suggested values:
+
+- local: `REACT_APP_WS_URL=ws://localhost:4000`
+- cloud: `REACT_APP_WS_URL=wss://your-domain.example.com/ws`
+- server: `HOST=0.0.0.0` and `PORT=4000`
+
+For Electron builds, you can also inject `GAME_SERVER_URL` at runtime. The app now resolves the game server address in this order:
+
+1. `GAME_SERVER_URL`
+2. `REACT_APP_WS_URL`
+3. `ws://localhost:4000`
+
+Typical production topology:
+
+- Node WebSocket server listens on `0.0.0.0:4000`
+- Nginx or another reverse proxy exposes `wss://your-domain.example.com/ws`
+- Frontend connects to that `wss://` address
