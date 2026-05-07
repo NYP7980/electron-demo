@@ -1,11 +1,8 @@
-// src/hooks/useGameSocket.ts
-// WebSocket client hook: manages connection lifecycle, heartbeat, and reconnection.
-// Dispatches incoming server messages to RoomContext.
 import { useEffect, useRef, useCallback } from 'react';
 import { useRoom } from '../contexts/RoomContext';
+import { getGameServerUrl } from '../config/gameServer';
 import type { ServerMessage } from '../types/shared';
 
-const WS_URL = process.env.REACT_APP_WS_URL || 'ws://localhost:4000';
 const MAX_RECONNECT_ATTEMPTS = 3;
 const RECONNECT_DELAY_MS = 2000;
 const HEARTBEAT_INTERVAL_MS = 25000;
@@ -23,7 +20,6 @@ export function useGameSocket(): UseGameSocketReturn {
   const reconnectAttemptsRef = useRef(0);
   const heartbeatTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  // Track whether the hook is still mounted to avoid state updates after unmount
   const mountedRef = useRef(true);
 
   const clearHeartbeat = useCallback(() => {
@@ -40,7 +36,6 @@ export function useGameSocket(): UseGameSocketReturn {
     }
   }, []);
 
-  // sendMessage is stable across renders; it writes to the current ws ref
   const sendMessage = useCallback((msg: { type: string; [key: string]: unknown }) => {
     const ws = wsRef.current;
     if (ws && ws.readyState === WebSocket.OPEN) {
@@ -51,7 +46,7 @@ export function useGameSocket(): UseGameSocketReturn {
   const connect = useCallback(() => {
     if (!mountedRef.current) return;
 
-    const ws = new WebSocket(WS_URL);
+    const ws = new WebSocket(getGameServerUrl());
     wsRef.current = ws;
 
     ws.onopen = () => {
@@ -59,7 +54,6 @@ export function useGameSocket(): UseGameSocketReturn {
       reconnectAttemptsRef.current = 0;
       dispatch({ type: 'CONNECTED' });
 
-      // Start heartbeat
       clearHeartbeat();
       heartbeatTimerRef.current = setInterval(() => {
         if (ws.readyState === WebSocket.OPEN) {
@@ -93,13 +87,10 @@ export function useGameSocket(): UseGameSocketReturn {
     };
 
     ws.onerror = () => {
-      // onclose will fire after onerror; reconnect logic lives there
       ws.close();
     };
   }, [dispatch, clearHeartbeat]);
 
-  // Inject sendMessage into RoomContext so consumers can call it without
-  // needing a direct reference to the hook return value
   useEffect(() => {
     setSendMessage(sendMessage);
   }, [sendMessage, setSendMessage]);
@@ -113,14 +104,12 @@ export function useGameSocket(): UseGameSocketReturn {
       clearHeartbeat();
       clearReconnectTimer();
       if (wsRef.current) {
-        wsRef.current.onclose = null; // prevent reconnect on intentional unmount
+        wsRef.current.onclose = null;
         wsRef.current.close();
         wsRef.current = null;
       }
     };
-    // connect is stable (useCallback with no deps that change), run once on mount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [clearHeartbeat, clearReconnectTimer, connect]);
 
   return {
     connected: roomState.connected,
